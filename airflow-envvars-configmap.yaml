@@ -20,4 +20,6 @@ data:
   AIRFLOW__KUBERNETES__ENV_FROM_CONFIGMAP_REF: airflow-envvars-configmap
   ## Tell Airflow to pick up the dag changes more frequently
   AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: "20"
+  ## For somereason the auto-generated key is bad format which can't be base64 decoded and cause FERNET_KEY missing error when using Variables
+  AIRFLOW__CORE__FERNET_KEY: "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI="
 

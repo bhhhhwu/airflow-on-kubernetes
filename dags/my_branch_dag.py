@@ -1,8 +1,9 @@
 import random
 
-from airflow.models import DAG
+from airflow.models import DAG, Variable
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import BranchPythonOperator
+from airflow.operators.python_operator import (BranchPythonOperator,
+                                               PythonOperator)
 from airflow.utils.dates import days_ago
 
 args = {
@@ -35,12 +36,21 @@ run_this_first >> branching
 
 join = DummyOperator(
     task_id='join',
-    trigger_rule='',
+    trigger_rule='one_success',
     dag=dag,
 )
 
-end_task = DummyOperator(
-    task_id='end', dag=dag
+
+def my_function(*args, **kwargs):
+    var1 = Variable.get('var1')
+    print(f'var1= {var1}, args= {args}, kwargs= {kwargs}')
+    Variable.set("key1", "1.2.3")
+    return None
+
+
+end_task = PythonOperator(
+    task_id='end', dag=dag, python_callable=my_function, provide_context=True, op_args=[Variable.get("var1")],
+    op_kwargs={"key": "string outside of {{ var.value.var1 }}"}
 )
 
 for option in options:
